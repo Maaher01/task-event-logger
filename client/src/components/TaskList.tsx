@@ -10,6 +10,8 @@ interface TaskListProps {
 
 function TaskList({ tasks, onTasksChange, onNewLog }: TaskListProps) {
 	const [loading, setLoading] = useState(tasks.length === 0);
+	const [error, setError] = useState<string | null>(null);
+	const [toggleError, setToggleError] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchTasks = async () => {
@@ -18,13 +20,20 @@ function TaskList({ tasks, onTasksChange, onNewLog }: TaskListProps) {
 					`${import.meta.env.VITE_API_URL}/api/tasks`,
 				);
 
+				if (response.status === 404) {
+					onTasksChange([]);
+					return;
+				}
+
 				if (!response.ok) {
 					throw new Error("Failed to fetch tasks");
 				}
 
-				const data = (await response.json()) as Task[];
+				const { data } = (await response.json()) as { data: Task[] };
+
 				onTasksChange(data);
 			} catch (error) {
+				setError("Could not load tasks. Please try again later.");
 				console.error(error);
 			} finally {
 				setLoading(false);
@@ -40,28 +49,36 @@ function TaskList({ tasks, onTasksChange, onNewLog }: TaskListProps) {
 		try {
 			const response = await fetch(
 				`${import.meta.env.VITE_API_URL}/api/tasks/${taskId}/toggle`,
-				{
-					method: "PATCH",
-				},
+				{ method: "PATCH" },
 			);
 
 			if (!response.ok) {
 				throw new Error("Failed to toggle task");
 			}
 
-			const { task, log } = (await response.json()) as {
-				task: Task;
-				log: ActivityLog;
+			const { data } = (await response.json()) as {
+				data: { task: Task; log: ActivityLog };
 			};
+
 			const nextTasks = tasks.map((item) =>
-				item._id === task._id ? task : item,
+				item._id === data.task._id ? data.task : item,
 			);
+
 			onTasksChange(nextTasks);
-			onNewLog(log);
+			onNewLog(data.log);
 		} catch (error) {
+			setToggleError("Could not update task status. Please try again.");
 			console.error(error);
 		}
 	};
+
+	if (error) {
+		return (
+			<div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-red-500">
+				{error}
+			</div>
+		);
+	}
 
 	if (loading) {
 		return (
@@ -73,6 +90,11 @@ function TaskList({ tasks, onTasksChange, onNewLog }: TaskListProps) {
 
 	return (
 		<div className="space-y-4">
+			{toggleError && (
+				<div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-500">
+					{toggleError}
+				</div>
+			)}
 			{tasks.map((task) => (
 				<TaskCard key={task._id} task={task} onToggle={handleToggle} />
 			))}

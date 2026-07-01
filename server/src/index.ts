@@ -1,7 +1,11 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
+
+import { corsOptions } from "./config/corsOptions";
+import databaseConnection from "./config/dbConnection";
+import middleware from "./middleware/errorHandler";
+
 import taskRoutes from "./routes/tasks";
 import logRoutes from "./routes/logs";
 
@@ -9,33 +13,28 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
-const mongoUri = process.env.MONGO_URI;
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/tasks", taskRoutes);
 app.use("/api/logs", logRoutes);
 
-app.get("/", (_req, res) => {
-	res.send({ status: "ok" });
+/**
+ * MAIN BASE GET PATH
+ */
+app.get("/", (req, res) => {
+	res.send(
+		`<div style="width: 100%; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center">
+			<h1 style="color: blueviolet">API RUNNING...</h1>
+		</div>`,
+	);
 });
 
-const start = async () => {
-	if (!mongoUri) {
-		console.error("Missing MONGO_URI environment variable");
-		process.exit(1);
-	}
+app.use(middleware.notFound);
+app.use(middleware.errorHandler);
 
-	try {
-		await mongoose.connect(mongoUri);
-		app.listen(port, () => {
-			console.log(`Server running on http://localhost:${port}`);
-		});
-	} catch (error) {
-		console.error("Failed to connect to MongoDB", error);
-		process.exit(1);
-	}
-};
-
-start();
+app.listen(port, async () => {
+	await databaseConnection();
+	console.log(`Server running on http://localhost:${port}`);
+});

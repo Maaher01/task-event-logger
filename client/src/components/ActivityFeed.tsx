@@ -8,6 +8,7 @@ interface ActivityFeedProps {
 
 function ActivityFeed({ logs, onLogsChange }: ActivityFeedProps) {
 	const [loading, setLoading] = useState(logs.length === 0);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchLogs = async () => {
@@ -15,13 +16,21 @@ function ActivityFeed({ logs, onLogsChange }: ActivityFeedProps) {
 				const response = await fetch(
 					`${import.meta.env.VITE_API_URL}/api/logs`,
 				);
+
+				if (response.status === 404) {
+					onLogsChange([]);
+					return;
+				}
+
 				if (!response.ok) {
 					throw new Error("Failed to fetch logs");
 				}
 
-				const data = (await response.json()) as ActivityLog[];
+				const { data } = (await response.json()) as { data: ActivityLog[] };
+
 				onLogsChange(data);
 			} catch (error) {
+				setError("Could not load activity feed. Please try again later.");
 				console.error(error);
 			} finally {
 				setLoading(false);
@@ -37,6 +46,22 @@ function ActivityFeed({ logs, onLogsChange }: ActivityFeedProps) {
 		return (
 			<div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
 				Loading activity...
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-red-500">
+				{error}
+			</div>
+		);
+	}
+
+	if (logs.length === 0) {
+		return (
+			<div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-500">
+				No activity yet.
 			</div>
 		);
 	}

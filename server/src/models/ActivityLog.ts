@@ -6,11 +6,27 @@ export interface ActivityLogDocument extends Document {
 	timestamp: Date;
 }
 
-const activityLogSchema = new Schema<ActivityLogDocument>({
-	activity: { type: String, required: true },
-	taskId: { type: Schema.Types.ObjectId, ref: "Task", required: true },
-	timestamp: { type: Date, default: Date.now },
-});
+const activityLogSchema = new Schema<ActivityLogDocument>(
+	{
+		activity: {
+			type: String,
+			required: true,
+		},
+		taskId: {
+			type: Schema.Types.ObjectId,
+			ref: "Task",
+			required: true,
+		},
+		timestamp: {
+			type: Date,
+			default: Date.now,
+		},
+	},
+	{
+		versionKey: false,
+		timestamps: true,
+	},
+);
 
 export const ActivityLog = model<ActivityLogDocument>(
 	"ActivityLog",

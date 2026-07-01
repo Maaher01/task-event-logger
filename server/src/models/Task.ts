@@ -7,15 +7,26 @@ export interface TaskDocument extends Document {
 	createdAt: Date;
 }
 
-const taskSchema = new Schema<TaskDocument>({
-	title: { type: String, required: true },
-	description: { type: String, default: "" },
-	status: {
-		type: String,
-		enum: ["To Do", "In Progress", "Done"],
-		default: "To Do",
+const taskSchema = new Schema<TaskDocument>(
+	{
+		title: {
+			type: String,
+			required: true,
+		},
+		description: {
+			type: String,
+			default: "",
+		},
+		status: {
+			type: String,
+			enum: ["To Do", "In Progress", "Done"],
+			default: "To Do",
+		},
 	},
-	createdAt: { type: Date, default: Date.now },
-});
+	{
+		versionKey: false,
+		timestamps: true,
+	},
+);
 
 export const Task = model<TaskDocument>("Task", taskSchema);
