@@ -15,7 +15,7 @@ as AI coding agent to accelerate development, generate boilerplate, and debug is
 > "task-event-logger". Generate the folder structure with src/index.ts as the entry point,
 > a config/ folder for database connection, a routes/ folder for task and log routes,
 > and a models/ folder. Include package.json with express, mongoose, cors, dotenv,
-> typescript, and ts-node-dev as dependencies, and a tsconfig.json configured for Node.js.
+> typescript, and nodemon as dependencies, and a tsconfig.json configured for Node.js.
 
 **Result:** Generated the initial project structure, package.json, and tsconfig.json instantly,
 saving manual setup time.
