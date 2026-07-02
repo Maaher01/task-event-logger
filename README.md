@@ -13,7 +13,7 @@ A minimal MERN app with TypeScript, Express, MongoDB, and React + Tailwind CSS.
    ```
 5. Start the backend:
    ```bash
-   npm run dev
+   npm start
    ```
 
 ## Frontend
