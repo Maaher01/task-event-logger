@@ -1,6 +1,6 @@
 # AI Collaboration
 
-This project was built with assistance from **GitHub Copilot** (VS Code)
+This project was built with assistance from **Codex** (VS Code Extension)
 as AI coding agent to accelerate development, generate boilerplate, and debug issues.
 
 ---
